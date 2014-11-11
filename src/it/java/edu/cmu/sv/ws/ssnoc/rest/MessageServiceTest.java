@@ -184,6 +184,15 @@ public class MessageServiceTest extends TestCase {
         assertTrue(passed);
     }
 
+    public void testGetPM() throws Exception {
+
+        DBUtils.initializeDatabase();
+
+        MessageService ms = new MessageService();
+        String res = ms.getPMs("0");
+        assertEquals(res, null);
+    }
+
 
     public void testSendPMHasRightAuthor() throws Exception {
 
