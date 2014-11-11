@@ -29,8 +29,6 @@ public class MessagesService extends BaseService {
             }
         } catch (Exception e) {
             handleException(e);
-        } finally {
-
         }
 
         return messages;
@@ -52,8 +50,6 @@ public class MessagesService extends BaseService {
             }
         } catch (Exception e) {
             handleException(e);
-        } finally {
-
         }
 
         return messages;
@@ -75,8 +71,6 @@ public class MessagesService extends BaseService {
             }
         } catch (Exception e) {
             handleException(e);
-        } finally {
-
         }
 
         return messages;
