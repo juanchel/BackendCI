@@ -37,14 +37,10 @@ public class MessageService extends BaseService {
 
         m.setTimestamp(ts);
 
-        try {
-            IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
-            MessagePO po = ConverterUtils.convert(m);
-            dao.save(po);
-            resp = ConverterUtils.convert(po);
-        } catch (Exception e) {
-            handleException(e);
-        }
+        IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
+        MessagePO po = ConverterUtils.convert(m);
+        dao.save(po);
+        resp = ConverterUtils.convert(po);
 
         return created(resp);
     }
@@ -66,14 +62,10 @@ public class MessageService extends BaseService {
 
         m.setTimestamp(ts);
 
-        try {
-            IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
-            MessagePO po = ConverterUtils.convert(m);
-            dao.saveAnnouncement(po);
-            resp = ConverterUtils.convert(po);
-        } catch (Exception e) {
-            handleException(e);
-        }
+        IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
+        MessagePO po = ConverterUtils.convert(m);
+        dao.saveAnnouncement(po);
+        resp = ConverterUtils.convert(po);
 
         return created(resp);
     }
@@ -95,14 +87,10 @@ public class MessageService extends BaseService {
 
         m.setTimestamp(ts);
 
-        try {
-            IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
-            MessagePO po = ConverterUtils.convert(m);
-            dao.save(po);
-            resp = ConverterUtils.convert(po);
-        } catch (Exception e) {
-            handleException(e);
-        }
+        IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
+        MessagePO po = ConverterUtils.convert(m);
+        dao.save(po);
+        resp = ConverterUtils.convert(po);
 
         return created(resp);
     }
