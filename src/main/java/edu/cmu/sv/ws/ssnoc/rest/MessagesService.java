@@ -19,18 +19,13 @@ public class MessagesService extends BaseService {
     public List<Message> getWallPosts () {
         List<Message> messages = null;
 
-        try {
-            List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadWallMessages();
+        List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadWallMessages();
 
-            messages = new ArrayList<Message>();
-            for (MessagePO po : messagePOs) {
-                Message dto = ConverterUtils.convert(po);
-                messages.add(dto);
-            }
-        } catch (Exception e) {
-            handleException(e);
+        messages = new ArrayList<Message>();
+        for (MessagePO po : messagePOs) {
+            Message dto = ConverterUtils.convert(po);
+            messages.add(dto);
         }
-
         return messages;
     }
 
@@ -40,18 +35,13 @@ public class MessagesService extends BaseService {
     public List<Message> getPMs (@PathParam("author") String author, @PathParam("target") String target) {
         List<Message> messages = null;
 
-        try {
-            List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadPrivateMessages(author, target);
+        List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadPrivateMessages(author, target);
 
-            messages = new ArrayList<Message>();
-            for (MessagePO po : messagePOs) {
-                Message dto = ConverterUtils.convert(po);
-                messages.add(dto);
-            }
-        } catch (Exception e) {
-            handleException(e);
+        messages = new ArrayList<Message>();
+        for (MessagePO po : messagePOs) {
+            Message dto = ConverterUtils.convert(po);
+            messages.add(dto);
         }
-
         return messages;
     }
 
@@ -61,16 +51,12 @@ public class MessagesService extends BaseService {
     public List<Message> getAnnouncements () {
         List<Message> messages = null;
 
-        try {
-            List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadAnnouncement();
+        List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadAnnouncement();
 
-            messages = new ArrayList<Message>();
-            for (MessagePO po : messagePOs) {
-                Message dto = ConverterUtils.convert(po);
-                messages.add(dto);
-            }
-        } catch (Exception e) {
-            handleException(e);
+        messages = new ArrayList<Message>();
+        for (MessagePO po : messagePOs) {
+            Message dto = ConverterUtils.convert(po);
+            messages.add(dto);
         }
 
         return messages;
