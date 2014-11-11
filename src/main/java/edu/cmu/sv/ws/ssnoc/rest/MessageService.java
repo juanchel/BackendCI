@@ -111,19 +111,8 @@ public class MessageService extends BaseService {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("/{messageId}")
     public String getPMs (@PathParam("messageId") String id) {
-
-
         String msg = null;
-        try {
-            msg = DAOFactory.getInstance().getMessageDAO().loadMessageById(Integer.parseInt(id));
-
-
-        } catch (Exception e) {
-            handleException(e);
-        } finally {
-
-        }
-
+        msg = DAOFactory.getInstance().getMessageDAO().loadMessageById(Integer.parseInt(id));
         return msg;
     }
 }
