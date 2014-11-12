@@ -12,4 +12,8 @@ public class MessageDAOImplTest extends TestCase {
     public void tearDown() throws Exception {
 
     }
+
+    public void testSomething() throws Exception {
+        assertTrue(true);
+    }
 }
