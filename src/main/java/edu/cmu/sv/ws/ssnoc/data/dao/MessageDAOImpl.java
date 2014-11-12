@@ -16,23 +16,33 @@ import edu.cmu.sv.ws.ssnoc.dto.TestResult;
 
 /**
  * DAO implementation for saving User information in the H2 database.
- *
  */
 public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
     /**
      * This method will save the information of the user into the database.
      *
-     * @param messagePO
-     *            - User information to be saved.
+     * @param messagePO - User information to be saved.
      */
-    public void save(MessagePO messagePO){
+    public void save(MessagePO messagePO) {
         Log.enter(messagePO);
         if (messagePO == null) {
             Log.warn("Inside save method with messagePO == NULL");
             return;
         }
 
-        if(messagePO.getPublic()) {
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL.DOES_USER_EXIST)) {
+            stmt.setString(1, messagePO.getAuthor());
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                return;
+            }
+        } catch (SQLException e) {
+            handleException(e);
+        }
+
+        if (messagePO.getPublic()) {
             try (Connection conn = getConnection();
                  PreparedStatement stmt = conn.prepareStatement(SQL.POST_ON_WALL)) {
                 stmt.setString(1, messagePO.getContent());
@@ -45,9 +55,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
             } finally {
                 Log.exit();
             }
-        }
-        else
-        {
+        } else {
             try (Connection conn = getConnection();
                  PreparedStatement stmt = conn.prepareStatement(SQL.SEND_PRIVATE_MESSAGE)) {
                 stmt.setString(1, messagePO.getContent());
@@ -65,7 +73,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
 
     }
 
-    public void saveAnnouncement(MessagePO messagePO){
+    public void saveAnnouncement(MessagePO messagePO) {
         Log.enter(messagePO);
         if (messagePO == null) {
             Log.warn("Inside save method with messagePO == NULL");
@@ -86,7 +94,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         }
     }
 
-    public List<MessagePO> loadAnnouncement(){
+    public List<MessagePO> loadAnnouncement() {
         Log.enter();
 
         String query = SQL.GET_ALL_ANNOUNCEMENTS;
@@ -102,7 +110,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         return messages;
     }
 
-    public void testSave(MessagePO messagePO){
+    public void testSave(MessagePO messagePO) {
         Log.enter(messagePO);
         if (messagePO == null) {
             Log.warn("Inside save method with messagePO == NULL");
@@ -110,7 +118,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         }
 
         try (Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement(SQL.TEST_POST_ON_WALL)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL.TEST_POST_ON_WALL)) {
             stmt.setString(1, messagePO.getContent());
             stmt.setString(2, messagePO.getAuthor());
             stmt.setTimestamp(3, Timestamp.valueOf(messagePO.getTimestamp()));
@@ -139,30 +147,30 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
      *
      * @return - List of messages.
      */
-     public List<MessagePO> loadWallMessages(){
-         Log.enter();
+    public List<MessagePO> loadWallMessages() {
+        Log.enter();
 
-         String query = SQL.GET_ALL_PUBLIC_MESSAGES;
+        String query = SQL.GET_ALL_PUBLIC_MESSAGES;
 
-         List<MessagePO> messages = new ArrayList<MessagePO>();
-         try (Connection conn = getConnection();
+        List<MessagePO> messages = new ArrayList<MessagePO>();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);) {
-             messages = processPublicResults(stmt);
-         } catch (SQLException e) {
-             handleException(e);
-             Log.exit(messages);
-         }
-         return messages;
-     }
+            messages = processPublicResults(stmt);
+        } catch (SQLException e) {
+            handleException(e);
+            Log.exit(messages);
+        }
+        return messages;
+    }
 
-    public List<MessagePO> testLoadWallMessages(){
+    public List<MessagePO> testLoadWallMessages() {
         Log.enter();
 
         String query = SQL.TEST_GET_FROM_WALL;
 
         List<MessagePO> messages = new ArrayList<MessagePO>();
         try (Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);) {
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             messages = processPublicResults(stmt);
         } catch (SQLException e) {
             handleException(e);
@@ -187,7 +195,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
 
         List<String> usernames = new ArrayList<String>();
         try (Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);) {
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 usernames.add(rs.getString(1));
@@ -202,7 +210,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         List<String> targets = new ArrayList<String>();
 
         try (Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query2);) {
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
             stmt.setTimestamp(1, timestamp);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -287,7 +295,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         // Conversion from set set to list list
         List<List<UserPO>> clusters = new ArrayList<List<UserPO>>();
         for (Set<String> group : clusterSet) {
-            List<UserPO> poList = new ArrayList<UserPO> ();
+            List<UserPO> poList = new ArrayList<UserPO>();
             for (String un : group) {
                 UserPO po = new UserPO();
                 po.setUserName(un);
@@ -326,7 +334,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         return po;
     }
 
-    public boolean testCheckTime () {
+    public boolean testCheckTime() {
 
         boolean valid = true;
 
@@ -334,7 +342,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
              PreparedStatement stmt = conn
                      .prepareStatement(SQL.TEST_CHECK_TIME)) {
             ResultSet rs = stmt.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 valid = rs.getBoolean(1);
             }
         } catch (SQLException e) {
@@ -400,13 +408,14 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
 
         return messages;
     }
+
     /**
      * This method will load all the users in the
      * database.
      *
      * @return - List of messages.
      */
-    public List<UserPO> loadChatBuddies(String author){
+    public List<UserPO> loadChatBuddies(String author) {
         if (author == null) {
             Log.warn("Inside findByName method with NULL author.");
             return null;
@@ -465,7 +474,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
      *
      * @return - List of messages.
      */
-    public String loadMessageById(int id){
+    public String loadMessageById(int id) {
         Log.enter(id);
 
 //        if (id == null) {
@@ -522,8 +531,8 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
                 float gets = rs.getInt(1);
                 float posts = rs.getInt(2);
                 float time = rs.getInt(3);
-                tr.setGet(gets/time);
-                tr.setPost(posts/time);
+                tr.setGet(gets / time);
+                tr.setPost(posts / time);
             }
         } catch (SQLException e) {
             handleException(e);
@@ -554,7 +563,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         return tr;
     }
 
-    public void startTest(int seconds){
+    public void startTest(int seconds) {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn
                      .prepareStatement(SQL.CREATE_TEST_GET)) {
@@ -608,7 +617,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
                      .prepareStatement(SQL.INSERT_TIME_INTO_TEST)) {
 
             Date date = new Date();
-            date.setTime(date.getTime() + seconds*1000);
+            date.setTime(date.getTime() + seconds * 1000);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             stmt.setTimestamp(1, Timestamp.valueOf(sdf.format(date)));
             stmt.setInt(2, seconds);
@@ -620,7 +629,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
     }
 
 
-    public List<MessagePO> searchWall(String content){
+    public List<MessagePO> searchWall(String content) {
         Log.enter();
 
         String query = SQL.SEARCH_WALL;
@@ -628,7 +637,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         List<MessagePO> messages = new ArrayList<MessagePO>();
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);) {
-            stmt.setString(1, "%"+content+"%");
+            stmt.setString(1, "%" + content + "%");
             messages = processPublicResults(stmt);
         } catch (SQLException e) {
             handleException(e);
@@ -637,7 +646,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         return messages;
     }
 
-    public List<MessagePO> searchAnnouncements(String content){
+    public List<MessagePO> searchAnnouncements(String content) {
         Log.enter();
 
         String query = SQL.SEARCH_ANNOUNCEMENTS;
@@ -645,7 +654,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         List<MessagePO> messages = new ArrayList<MessagePO>();
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);) {
-            stmt.setString(1, "%"+content+"%");
+            stmt.setString(1, "%" + content + "%");
             messages = processPublicResults(stmt);
         } catch (SQLException e) {
             handleException(e);
@@ -654,7 +663,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         return messages;
     }
 
-    public List<MessagePO> searchPM(String content, String username){
+    public List<MessagePO> searchPM(String content, String username) {
         Log.enter();
 
         String query = SQL.SEARCH_PM;
@@ -662,7 +671,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
         List<MessagePO> messages = new ArrayList<MessagePO>();
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);) {
-            stmt.setString(1, "%"+content+"%");
+            stmt.setString(1, "%" + content + "%");
             stmt.setString(2, username);
             stmt.setString(3, username);
             messages = processPrivateResults(stmt);

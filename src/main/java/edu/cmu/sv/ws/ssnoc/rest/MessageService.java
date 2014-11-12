@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import edu.cmu.sv.ws.ssnoc.common.utils.ConverterUtils;
 import edu.cmu.sv.ws.ssnoc.data.dao.DAOFactory;
 import edu.cmu.sv.ws.ssnoc.data.dao.IMessageDAO;
+import edu.cmu.sv.ws.ssnoc.data.dao.IUserDAO;
 import edu.cmu.sv.ws.ssnoc.data.po.MessagePO;
 import edu.cmu.sv.ws.ssnoc.dto.Message;
 

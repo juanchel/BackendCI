@@ -11,14 +11,14 @@ public class SQL {
      * List the USERS table name, and list all queries related to this table
      * here.
      */
-    public static final String SSN_USERS = "SSN_USERS";
+    public static String SSN_USERS = "SSN_USERS";
     public static String SSN_MESSAGES = "SSN_MESSAGES";
     public static String PRIVATE_MESSAGES = "PRIVATE_MESSAGES";
     public static final String TEST_POST = "TEST_POST";
     public static final String TEST_GET = "TEST_GET";
     public static final String TEST_RESULTS = "TEST_RESULTS";
     public static final String MEMORY_TEST = "MEMORY_TEST";
-    public static final String SSN_ANNOUNCEMENTS = "SSN_ANNOUNCEMENTS";
+    public static String SSN_ANNOUNCEMENTS = "SSN_ANNOUNCEMENTS";
 
 
     /**
@@ -47,7 +47,7 @@ public class SQL {
             "FOREIGN KEY (author) REFERENCES public.SSN_USERS(user_name)"+
             ");";
 
-    public static final String CREATE_PM = "CREATE TABLE " + PRIVATE_MESSAGES + " (" +
+    public static final String CREATE_PM = "CREATE TABLE IF NOT EXISTS " + PRIVATE_MESSAGES + " (" +
             "content varchar(512)," +
             "author varchar(255)," +
             "target varchar(255)," +
@@ -189,4 +189,6 @@ public class SQL {
     public static final String SEARCH_WALL = "SELECT * from " + SSN_MESSAGES + " WHERE message LIKE ?";
     public static final String SEARCH_ANNOUNCEMENTS = "SELECT * from " + SSN_ANNOUNCEMENTS + " WHERE message LIKE ?";
     public static final String SEARCH_PM = "SELECT * from " + PRIVATE_MESSAGES + " WHERE content LIKE ? AND (author=? OR target=?)";
+
+    public static final String DOES_USER_EXIST = "SELECT count(1) from " + SSN_USERS + " WHERE user_name = ?";
 }

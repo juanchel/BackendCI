@@ -102,8 +102,6 @@ public class TestService extends BaseService{
             }
         } catch (Exception e) {
             handleException(e);
-        } finally {
-
         }
 
         Message resp = new Message();

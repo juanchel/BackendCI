@@ -7,6 +7,7 @@ import edu.cmu.sv.ws.ssnoc.dto.User;
 import junit.framework.TestCase;
 import org.junit.AfterClass;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,36 +17,28 @@ import java.util.List;
 
 public class MessageServiceTest extends TestCase {
 
-    public void testPostAnnouncement() throws Exception {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        File file = new File(System.getProperty("user.home") + "/h2db.mv.db");
+        File file2 = new File(System.getProperty("user.home") + "/h2db.mv.db.backup");
 
-        DBUtils.initializeDatabase();
-
-        UserService us = new UserService();
-        User u = new User();
-        u.setUserName("demo");
-        u.setPassword("asdf");
-
-        us.addUser(u);
-
-        MessageService ms = new MessageService();
-        Message message = new Message();
-        message.setContent("test");
-        ms.postAnnouncement("demo", message);
-
-        MessagesService mss = new MessagesService();
-        List<Message> ret = mss.getAnnouncements();
-        List<String> contents = new ArrayList<String>();
-        for (Message m : ret) {
-            contents.add(m.getContent());
+        if (!file2.exists()) {
+            file.renameTo(file2);
+        } else {
+            file2.delete();
+            file.renameTo(file2);
         }
-        boolean passed = false;
-        for (String content : contents) {
-            if (content.equals("test")) {
-                passed = true;
-                break;
-            }
-        }
-        assertTrue(passed);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        File file = new File(System.getProperty("user.home") + "/h2db.mv.db");
+        File file2 = new File(System.getProperty("user.home") + "/h2db.mv.db.backup");
+
+        file.delete();
+        file2.renameTo(file);
     }
 
     public void testPostOnWall() throws Exception {
@@ -78,6 +71,31 @@ public class MessageServiceTest extends TestCase {
             }
         }
         assertTrue(passed);
+    }
+
+    public void testBadPostOnWall() throws Exception {
+
+        DBUtils.initializeDatabase();
+
+        MessageService ms = new MessageService();
+        Message message = new Message();
+        message.setContent("test");
+        ms.postOnWall("nobody", message);
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getWallPosts();
+        List<String> authors = new ArrayList<String>();
+        for (Message m : ret) {
+            authors.add(m.getAuthor());
+        }
+        boolean passed = false;
+        for (String author : authors) {
+            if (author.equals("nobody")) {
+                passed = true;
+                break;
+            }
+        }
+        assertFalse(passed);
     }
 
     public void testPostOnWallHasRightAuthor() throws Exception {
@@ -160,8 +178,10 @@ public class MessageServiceTest extends TestCase {
         u.setUserName("jc");
         u.setPassword("asdf");
         User u2 = new User();
-        u.setUserName("vinay");
-        u.setPassword("asdf");
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        us.addUser(u);
+        us.addUser(u2);
 
         MessageService ms = new MessageService();
         Message message = new Message();
@@ -185,11 +205,10 @@ public class MessageServiceTest extends TestCase {
     }
 
     public void testGetPM() throws Exception {
-
         DBUtils.initializeDatabase();
 
         MessageService ms = new MessageService();
-        String res = ms.getPMs("0");
+        String res = ms.getPMs("-1");
         assertEquals(res, null);
     }
 
@@ -203,8 +222,8 @@ public class MessageServiceTest extends TestCase {
         u.setUserName("jc");
         u.setPassword("asdf");
         User u2 = new User();
-        u.setUserName("vinay");
-        u.setPassword("asdf");
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
 
         MessageService ms = new MessageService();
         Message message = new Message();
@@ -237,8 +256,10 @@ public class MessageServiceTest extends TestCase {
         u.setUserName("jc");
         u.setPassword("asdf");
         User u2 = new User();
-        u.setUserName("vinay");
-        u.setPassword("asdf");
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        us.addUser(u);
+        us.addUser(u2);
 
         MessageService ms = new MessageService();
         Message message = new Message();
@@ -270,8 +291,10 @@ public class MessageServiceTest extends TestCase {
         u.setUserName("jc");
         u.setPassword("asdf");
         User u2 = new User();
-        u.setUserName("vinay");
-        u.setPassword("asdf");
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        us.addUser(u);
+        us.addUser(u2);
 
         MessageService ms = new MessageService();
         Message message = new Message();
@@ -307,7 +330,7 @@ public class MessageServiceTest extends TestCase {
     public void testSocialNetworkWithNobody() throws Exception {
 
         String query = "delete from PRIVATE_MESSAGES";
-        String que = "delete from SSN_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
         String query1 = "delete from SSN_USERS";
 
         try (Connection conn = getConnection();
@@ -316,7 +339,7 @@ public class MessageServiceTest extends TestCase {
         }
 
         try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(que);) {
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
             stmt.execute();
         }
 
@@ -333,15 +356,12 @@ public class MessageServiceTest extends TestCase {
     @AfterClass
     public void testSocialNetwork() throws Exception {
 
-        String query = "delete from PRIVATE_MESSAGES";
-        String que = "delete from SSN_MESSAGES";
-        String query1 = "delete from SSN_USERS";
-        String query2 = "delete from SSN_ANNOUNCEMENTS";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query2);) {
-            stmt.execute();
-        }
+        DBUtils.initializeDatabase();
+
+        String query = "delete from PRIVATE_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
+        String query1 = "delete from SSN_USERS";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);) {
@@ -349,7 +369,7 @@ public class MessageServiceTest extends TestCase {
         }
 
         try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(que);) {
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
             stmt.execute();
         }
 
@@ -357,7 +377,6 @@ public class MessageServiceTest extends TestCase {
              PreparedStatement stmt = conn.prepareStatement(query1);) {
             stmt.execute();
         }
-
 
         UserService us = new UserService();
         User u = new User();
@@ -390,15 +409,12 @@ public class MessageServiceTest extends TestCase {
     @AfterClass
     public void testSocialNetworkThreeCluster() throws Exception {
 
-        String query2 = "delete from SSN_ANNOUNCEMENTS";
+
+        DBUtils.initializeDatabase();
+
         String query = "delete from PRIVATE_MESSAGES";
         String que = "delete from SSN_MESSAGES";
         String query1 = "delete from SSN_USERS";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query2);) {
-            stmt.execute();
-        }
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);) {
