@@ -168,7 +168,6 @@ public class MessageServiceTest extends TestCase {
         assertTrue(passed && passed2);
     }
 
-
     public void testSendPM() throws Exception {
 
         DBUtils.initializeDatabase();
@@ -203,6 +202,33 @@ public class MessageServiceTest extends TestCase {
         }
         assertTrue(passed);
     }
+
+
+    public void testSendBadPM() throws Exception {
+
+        DBUtils.initializeDatabase();
+
+        MessageService ms = new MessageService();
+        Message message = new Message();
+        message.setContent("test");
+        ms.sendPM("nobody", "nobody2", message);
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getPMs("nobody", "nobody2");
+        List<String> contents = new ArrayList<String>();
+        for (Message m : ret) {
+            contents.add(m.getContent());
+        }
+        boolean passed = false;
+        for (String content : contents) {
+            if (content.equals("test")) {
+                passed = true;
+                break;
+            }
+        }
+        assertFalse(passed);
+    }
+
 
     public void testGetPM() throws Exception {
         DBUtils.initializeDatabase();
