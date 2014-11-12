@@ -217,7 +217,6 @@ public class MessageDAOImplTest extends TestCase {
             stmt.execute();
         }
 
-
         UserService us = new UserService();
         User u = new User();
         u.setUserName("jc");
@@ -226,6 +225,7 @@ public class MessageDAOImplTest extends TestCase {
         u2.setUserName("vinay");
         u2.setPassword("asdf");
         us.addUser(u);
+        us.addUser(u2);
 
         Message message = new Message();
         message.setContent("test");
@@ -241,6 +241,103 @@ public class MessageDAOImplTest extends TestCase {
         assertEquals(ret.get(0).size(), 1);
         assertEquals(ret.get(1).size(), 1);
         assertFalse(ret.get(0).get(0).getUserName() == ret.get(1).get(0).getUserName());
+    }
+
+    public void testAnalyzeWithTwoSilentPeople() throws Exception {
+        DBUtils.initializeDatabase();
+
+        String query = "delete from PRIVATE_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
+        String query1 = "delete from SSN_USERS";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query1);) {
+            stmt.execute();
+        }
+
+        UserService us = new UserService();
+        User u = new User();
+        u.setUserName("jc");
+        u.setPassword("asdf");
+        User u2 = new User();
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        us.addUser(u);
+        us.addUser(u2);
+
+        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        assertEquals(ret.size(), 1);
+        assertEquals(ret.get(0).size(), 2);
+        assertFalse(ret.get(0).get(1).getUserName() == ret.get(0).get(0).getUserName());
+    }
+
+    public void testAnalyzeThrowsAwayIdenticalSubArrays() throws Exception {
+        DBUtils.initializeDatabase();
+
+        String query = "delete from PRIVATE_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
+        String query1 = "delete from SSN_USERS";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query1);) {
+            stmt.execute();
+        }
+
+        UserService us = new UserService();
+        User u = new User();
+        u.setUserName("jc");
+        u.setPassword("asdf");
+        User u2 = new User();
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        User u3 = new User();
+        u3.setUserName("inbetween");
+        u3.setPassword("asdf");
+        us.addUser(u);
+        us.addUser(u2);
+        us.addUser(u3);
+
+        Message message = new Message();
+        message.setContent("test");
+        message.setAuthor("jc");
+        message.setTarget("inbetween");
+        message.setPublic(false);
+        message.setTimestamp("2000-01-01 12:00:00");
+
+        Message message2 = new Message();
+        message2.setContent("test");
+        message2.setAuthor("inbetween");
+        message2.setTarget("vinay");
+        message2.setPublic(false);
+        message2.setTimestamp("2000-01-01 12:00:01");
+
+        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
+        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message2));
+
+        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        assertEquals(ret.size(), 2);
+        assertEquals(ret.get(0).size(), 1);
+        assertEquals(ret.get(1).size(), 2);
     }
 
     protected Connection getConnection() throws SQLException {
