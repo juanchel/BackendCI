@@ -1,6 +1,7 @@
 package edu.cmu.sv.ws.ssnoc.data.dao;
 
 import edu.cmu.sv.ws.ssnoc.common.utils.ConverterUtils;
+import edu.cmu.sv.ws.ssnoc.data.po.UserPO;
 import edu.cmu.sv.ws.ssnoc.data.util.DBUtils;
 import edu.cmu.sv.ws.ssnoc.dto.Message;
 import edu.cmu.sv.ws.ssnoc.dto.User;
@@ -9,6 +10,10 @@ import edu.cmu.sv.ws.ssnoc.rest.UserService;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,4 +168,82 @@ public class MessageDAOImplTest extends TestCase {
         assertEquals(ret.size(), 0);
     }
 
+    public void testAnalyzeWithNobodyReturnsNobody() throws Exception {
+        DBUtils.initializeDatabase();
+
+        String query = "delete from PRIVATE_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
+        String query1 = "delete from SSN_USERS";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query1);) {
+            stmt.execute();
+        }
+
+        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        assertEquals(ret.size(), 1);
+        assertEquals(ret.get(0).size(), 0);
+    }
+
+    public void testAnalyzeWithTwoTalkers() throws Exception {
+        DBUtils.initializeDatabase();
+
+        String query = "delete from PRIVATE_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
+        String query1 = "delete from SSN_USERS";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query1);) {
+            stmt.execute();
+        }
+
+
+        UserService us = new UserService();
+        User u = new User();
+        u.setUserName("jc");
+        u.setPassword("asdf");
+        User u2 = new User();
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        us.addUser(u);
+
+        Message message = new Message();
+        message.setContent("test");
+        message.setAuthor("jc");
+        message.setTarget("vinay");
+        message.setPublic(false);
+        message.setTimestamp("2000-01-01 12:00:00");
+
+        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
+
+        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        assertEquals(ret.size(), 2);
+        assertEquals(ret.get(0).size(), 1);
+        assertEquals(ret.get(1).size(), 1);
+        assertFalse(ret.get(0).get(0).getUserName() == ret.get(1).get(0).getUserName());
+    }
+
+    protected Connection getConnection() throws SQLException {
+        return DBUtils.getConnection();
+    }
 }
