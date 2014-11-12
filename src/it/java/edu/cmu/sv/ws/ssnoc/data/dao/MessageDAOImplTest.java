@@ -137,12 +137,28 @@ public class MessageDAOImplTest extends TestCase {
         DBUtils.initializeDatabase();
 
         Message msg = new Message();
+        msg.setPublic(false);
         msg.setAuthor("nobody");
 
         assertFalse(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(msg)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getPMs("nobody", "");
+
+        assertEquals(ret.size(), 0);
+    }
+
+    public void testCantPostToWallFromNonexistentUser() throws Exception {
+        DBUtils.initializeDatabase();
+
+        Message msg = new Message();
+        msg.setPublic(true);
+        msg.setAuthor("nobody");
+
+        assertFalse(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(msg)));
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getWallPosts();
 
         assertEquals(ret.size(), 0);
     }
