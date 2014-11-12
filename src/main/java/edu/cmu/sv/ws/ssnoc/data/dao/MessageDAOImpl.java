@@ -23,11 +23,11 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
      *
      * @param messagePO - User information to be saved.
      */
-    public void save(MessagePO messagePO) {
+    public boolean save(MessagePO messagePO) {
         Log.enter(messagePO);
         if (messagePO == null) {
             Log.warn("Inside save method with messagePO == NULL");
-            return;
+            return false;
         }
 
         try (Connection conn = getConnection();
@@ -36,7 +36,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
             ResultSet rs = stmt.executeQuery();
             rs.next();
             if (rs.getInt(1) == 0) {
-                return;
+                return false;
             }
         } catch (SQLException e) {
             handleException(e);
@@ -70,7 +70,7 @@ public class MessageDAOImpl extends BaseDAOImpl implements IMessageDAO {
                 Log.exit();
             }
         }
-
+        return true;
     }
 
     public void saveAnnouncement(MessagePO messagePO) {

@@ -18,7 +18,7 @@ public interface IMessageDAO{
      * @param messagePO
      *            - User information to be saved.
      */
-    void save(MessagePO messagePO);
+    boolean save(MessagePO messagePO);
 
     /**
      * This method will load all the users in the

@@ -122,4 +122,16 @@ public class MessageDAOImplTest extends TestCase {
         assertTrue(passed);
     }
 
+    public void testCantSaveNullPMs() throws Exception {
+        DBUtils.initializeDatabase();
+
+        assertFalse(DAOFactory.getInstance().getMessageDAO().save(null));
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getPMs("", "");
+
+        assertEquals(ret.size(), 0);
+
+    }
+
 }
