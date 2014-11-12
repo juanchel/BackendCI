@@ -33,7 +33,6 @@ public class MessageServiceTest extends TestCase {
 
     @Override
     public void tearDown() throws Exception {
-        super.tearDown();
         File file = new File(System.getProperty("user.home") + "/h2db.mv.db");
         File file2 = new File(System.getProperty("user.home") + "/h2db.mv.db.backup");
 
