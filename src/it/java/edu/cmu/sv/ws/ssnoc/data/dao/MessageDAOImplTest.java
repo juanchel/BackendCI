@@ -44,7 +44,7 @@ public class MessageDAOImplTest extends TestCase {
         u.setPassword("asdf");
         us.addUser(u);
 
-        DAOFactory.getInstance().getMessageDAO().save(null);
+        assertFalse(DAOFactory.getInstance().getMessageDAO().save(null));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getWallPosts();
@@ -67,7 +67,7 @@ public class MessageDAOImplTest extends TestCase {
         message.setPublic(true);
         message.setTimestamp("1970-01-01 12:00:00");
 
-        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
+        assertTrue(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getWallPosts();
@@ -104,7 +104,7 @@ public class MessageDAOImplTest extends TestCase {
         message.setPublic(false);
         message.setTimestamp("1970-01-01 12:00:00");
 
-        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
+        assertTrue(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getPMs("jc", "vinay");
@@ -131,7 +131,6 @@ public class MessageDAOImplTest extends TestCase {
         List<Message> ret = mss.getPMs("", "");
 
         assertEquals(ret.size(), 0);
-
     }
 
 }
