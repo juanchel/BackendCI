@@ -133,4 +133,18 @@ public class MessageDAOImplTest extends TestCase {
         assertEquals(ret.size(), 0);
     }
 
+    public void testCantSendPMFromNonexistentUser() throws Exception {
+        DBUtils.initializeDatabase();
+
+        Message msg = new Message();
+        msg.setAuthor("nobody");
+
+        assertFalse(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(msg)));
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getPMs("nobody", "");
+
+        assertEquals(ret.size(), 0);
+    }
+
 }
