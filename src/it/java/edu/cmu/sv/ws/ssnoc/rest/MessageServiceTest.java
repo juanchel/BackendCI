@@ -380,6 +380,58 @@ public class MessageServiceTest extends TestCase {
     }
 
     @AfterClass
+    public void testSocialNetworkNoTime() throws Exception {
+
+
+        DBUtils.initializeDatabase();
+
+        String query = "delete from PRIVATE_MESSAGES";
+        String query2 = "delete from SSN_MESSAGES";
+        String query1 = "delete from SSN_USERS";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query2);) {
+            stmt.execute();
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query1);) {
+            stmt.execute();
+        }
+
+        UserService us = new UserService();
+        User u = new User();
+        u.setUserName("jc");
+        u.setPassword("asdf");
+        User u2 = new User();
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        User u3 = new User();
+        u3.setUserName("gaya");
+        u3.setPassword("testing");
+
+        us.addUser(u);
+        us.addUser(u2);
+        us.addUser(u3);
+
+        MessageService ms = new MessageService();
+        Message message = new Message();
+        message.setContent("test");
+        ms.sendPM("vinay", "jc", message);
+
+        UsersService users = new UsersService();
+        String res = users.getClusters(("0"));
+        assertTrue(res.indexOf("jc") == res.lastIndexOf("jc"));
+        assertTrue(res.indexOf("vinay") == res.lastIndexOf("vinay"));
+        assertTrue(res.indexOf("gaya") == res.lastIndexOf("gaya"));
+    }
+
+    @AfterClass
     public void testSocialNetwork() throws Exception {
 
 
@@ -425,7 +477,6 @@ public class MessageServiceTest extends TestCase {
         ms.sendPM("vinay", "jc", message);
 
         UsersService users = new UsersService();
-        users.getClusters("1");
         String res = users.getClusters(("1"));
         assertTrue(res.indexOf("gaya") != res.lastIndexOf("gaya"));
         assertFalse(res.indexOf("jc") == -1);
