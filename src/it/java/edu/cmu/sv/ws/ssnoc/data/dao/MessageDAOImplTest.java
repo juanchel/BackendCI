@@ -35,7 +35,7 @@ public class MessageDAOImplTest extends TestCase {
         file2.renameTo(file);
     }
 
-    public void testSavePublic() throws Exception {
+    public void testCanSavePubicMessage() throws Exception {
         DBUtils.initializeDatabase();
 
         UserService us = new UserService();
@@ -54,6 +54,43 @@ public class MessageDAOImplTest extends TestCase {
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getWallPosts();
+        List<String> contents = new ArrayList<String>();
+        for (Message m : ret) {
+            contents.add(m.getContent());
+        }
+        boolean passed = false;
+        for (String content : contents) {
+            if (content.equals("test")) {
+                passed = true;
+                break;
+            }
+        }
+        assertTrue(passed);
+    }
+
+    public void testCanSavePM() throws Exception {
+        DBUtils.initializeDatabase();
+
+        UserService us = new UserService();
+        User u = new User();
+        u.setUserName("jc");
+        u.setPassword("asdf");
+        User u2 = new User();
+        u2.setUserName("vinay");
+        u2.setPassword("asdf");
+        us.addUser(u);
+
+        Message message = new Message();
+        message.setContent("test");
+        message.setAuthor("jc");
+        message.setTarget("vinay");
+        message.setPublic(false);
+        message.setTimestamp("1970-01-01 12:00:00");
+
+        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getPMs("jc", "vinay");
         List<String> contents = new ArrayList<String>();
         for (Message m : ret) {
             contents.add(m.getContent());
