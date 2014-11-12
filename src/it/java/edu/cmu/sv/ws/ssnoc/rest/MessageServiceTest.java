@@ -425,9 +425,9 @@ public class MessageServiceTest extends TestCase {
 
         UsersService users = new UsersService();
         String res = users.getClusters(("0"));
-        assertTrue(res.indexOf("jc") == res.lastIndexOf("jc"));
-        assertTrue(res.indexOf("vinay") == res.lastIndexOf("vinay"));
-        assertTrue(res.indexOf("gaya") == res.lastIndexOf("gaya"));
+        assertEquals(res.indexOf("jc"), res.lastIndexOf("jc"));
+        assertEquals(res.indexOf("vinay"), res.lastIndexOf("vinay"));
+        assertEquals(res.indexOf("gaya"), res.lastIndexOf("gaya"));
     }
 
     @AfterClass
