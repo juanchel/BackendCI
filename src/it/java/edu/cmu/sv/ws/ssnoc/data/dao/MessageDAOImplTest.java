@@ -35,6 +35,23 @@ public class MessageDAOImplTest extends TestCase {
         file2.renameTo(file);
     }
 
+    public void testCantSaveNullWallPost() throws Exception {
+        DBUtils.initializeDatabase();
+
+        UserService us = new UserService();
+        User u = new User();
+        u.setUserName("demo");
+        u.setPassword("asdf");
+        us.addUser(u);
+
+        DAOFactory.getInstance().getMessageDAO().save(null);
+
+        MessagesService mss = new MessagesService();
+        List<Message> ret = mss.getWallPosts();
+
+        assertEquals(ret.size(), 0);
+    }
+
     public void testCanSavePubicMessage() throws Exception {
         DBUtils.initializeDatabase();
 
