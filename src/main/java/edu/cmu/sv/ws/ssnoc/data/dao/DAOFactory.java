@@ -35,4 +35,6 @@ public class DAOFactory {
     public IMessageDAO getMessageDAO() {return new MessageDAOImpl(); }
 
     public IMemoryDAO getMemoryDAO() {return new MemoryDAOImpl(); }
+
+    public IExchangeDAO getExchangeDAO() {return new ExchangeDAOImpl();}
 }

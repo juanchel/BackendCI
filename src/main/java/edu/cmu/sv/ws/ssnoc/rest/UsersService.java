@@ -92,7 +92,7 @@ public class UsersService extends BaseService {
         Timestamp ts = Timestamp.valueOf(sdf.format(date));
 
         try {
-            List<List<UserPO>> userPOLists = DAOFactory.getInstance().getMessageDAO().getClusters(ts);
+            List<List<UserPO>> userPOLists = DAOFactory.getInstance().getExchangeDAO().getClusters(ts);
 
 
             for (List<UserPO> poList : userPOLists) {

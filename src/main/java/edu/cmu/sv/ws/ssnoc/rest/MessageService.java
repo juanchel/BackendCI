@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 import edu.cmu.sv.ws.ssnoc.common.utils.ConverterUtils;
 import edu.cmu.sv.ws.ssnoc.data.dao.DAOFactory;
+import edu.cmu.sv.ws.ssnoc.data.dao.IExchangeDAO;
 import edu.cmu.sv.ws.ssnoc.data.dao.IMessageDAO;
 import edu.cmu.sv.ws.ssnoc.data.dao.IUserDAO;
 import edu.cmu.sv.ws.ssnoc.data.po.MessagePO;
@@ -38,7 +39,7 @@ public class MessageService extends BaseService {
 
         m.setTimestamp(ts);
 
-        IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
+        IExchangeDAO dao = DAOFactory.getInstance().getExchangeDAO();
         MessagePO po = ConverterUtils.convert(m);
         dao.save(po);
         resp = ConverterUtils.convert(po);
@@ -88,7 +89,7 @@ public class MessageService extends BaseService {
 
         m.setTimestamp(ts);
 
-        IMessageDAO dao = DAOFactory.getInstance().getMessageDAO();
+        IExchangeDAO dao = DAOFactory.getInstance().getExchangeDAO();
         MessagePO po = ConverterUtils.convert(m);
         dao.save(po);
         resp = ConverterUtils.convert(po);

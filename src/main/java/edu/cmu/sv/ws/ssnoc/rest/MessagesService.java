@@ -19,7 +19,7 @@ public class MessagesService extends BaseService {
     public List<Message> getWallPosts () {
         List<Message> messages = null;
 
-        List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadWallMessages();
+        List<MessagePO> messagePOs = DAOFactory.getInstance().getExchangeDAO().loadWallMessages();
 
         messages = new ArrayList<Message>();
         for (MessagePO po : messagePOs) {
@@ -35,7 +35,7 @@ public class MessagesService extends BaseService {
     public List<Message> getPMs (@PathParam("author") String author, @PathParam("target") String target) {
         List<Message> messages = null;
 
-        List<MessagePO> messagePOs = DAOFactory.getInstance().getMessageDAO().loadPrivateMessages(author, target);
+        List<MessagePO> messagePOs = DAOFactory.getInstance().getExchangeDAO().loadPrivateMessages(author, target);
 
         messages = new ArrayList<Message>();
         for (MessagePO po : messagePOs) {

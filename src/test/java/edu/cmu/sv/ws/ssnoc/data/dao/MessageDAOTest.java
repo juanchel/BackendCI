@@ -53,7 +53,7 @@ public class MessageDAOTest extends TestCase {
         List<Message> ret = mss.getWallPosts();
         int curCount = ret.size();
 
-        assertFalse(DAOFactory.getInstance().getMessageDAO().save(null));
+        assertFalse(DAOFactory.getInstance().getExchangeDAO().save(null));
 
 
 
@@ -75,7 +75,7 @@ public class MessageDAOTest extends TestCase {
         message.setPublic(true);
         message.setTimestamp("1970-01-01 12:00:00");
 
-        assertTrue(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message)));
+        assertTrue(DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(message)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getWallPosts();
@@ -112,7 +112,7 @@ public class MessageDAOTest extends TestCase {
         message.setPublic(false);
         message.setTimestamp("1970-01-01 12:00:00");
 
-        assertTrue(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message)));
+        assertTrue(DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(message)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getPMs("jc", "vinay");
@@ -138,7 +138,7 @@ public class MessageDAOTest extends TestCase {
         List<Message> ret = mss.getPMs("", "");
         int curSize = ret.size();
 
-        assertFalse(DAOFactory.getInstance().getMessageDAO().save(null));
+        assertFalse(DAOFactory.getInstance().getExchangeDAO().save(null));
 
         ret = mss.getPMs("", "");
 
@@ -153,7 +153,7 @@ public class MessageDAOTest extends TestCase {
         msg.setAuthor("nobody");
         msg.setTarget("nobody2");
 
-        assertFalse(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(msg)));
+        assertFalse(DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(msg)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getPMs("nobody", "nobody2");
@@ -168,7 +168,7 @@ public class MessageDAOTest extends TestCase {
         msg.setPublic(true);
         msg.setAuthor("nobody");
 
-        assertFalse(DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(msg)));
+        assertFalse(DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(msg)));
 
         MessagesService mss = new MessagesService();
         List<Message> ret = mss.getWallPosts();
@@ -198,7 +198,7 @@ public class MessageDAOTest extends TestCase {
             stmt.execute();
         }
 
-        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        List<List<UserPO>> ret = DAOFactory.getInstance().getExchangeDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
         assertEquals(ret.size(), 1);
         assertEquals(ret.get(0).size(), 0);
     }
@@ -242,9 +242,9 @@ public class MessageDAOTest extends TestCase {
         message.setPublic(false);
         message.setTimestamp("2000-01-01 12:00:00");
 
-        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
+        DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(message));
 
-        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        List<List<UserPO>> ret = DAOFactory.getInstance().getExchangeDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
         assertEquals(ret.size(), 2);
         assertEquals(ret.get(0).size(), 1);
         assertEquals(ret.get(1).size(), 1);
@@ -283,7 +283,7 @@ public class MessageDAOTest extends TestCase {
         us.addUser(u);
         us.addUser(u2);
 
-        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        List<List<UserPO>> ret = DAOFactory.getInstance().getExchangeDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
         assertEquals(ret.size(), 1);
         assertEquals(ret.get(0).size(), 2);
         assertFalse(ret.get(0).get(1).getUserName() == ret.get(0).get(0).getUserName());
@@ -339,10 +339,10 @@ public class MessageDAOTest extends TestCase {
         message2.setPublic(false);
         message2.setTimestamp("2000-01-01 12:00:01");
 
-        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message));
-        DAOFactory.getInstance().getMessageDAO().save(ConverterUtils.convert(message2));
+        DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(message));
+        DAOFactory.getInstance().getExchangeDAO().save(ConverterUtils.convert(message2));
 
-        List<List<UserPO>> ret = DAOFactory.getInstance().getMessageDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
+        List<List<UserPO>> ret = DAOFactory.getInstance().getExchangeDAO().getClusters(Timestamp.valueOf("1970-01-01 12:00:00"));
         assertEquals(ret.size(), 2);
         assertEquals(ret.get(0).size(), 1);
         assertEquals(ret.get(1).size(), 2);
